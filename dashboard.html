@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Platform Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: linear-gradient(90deg, rgba(59,130,246,0.15) 0%, transparent 100%);
+            border-left: 3px solid #3b82f6;
+            color: white;
+        }
+        .nav-item { border-left: 3px solid transparent; }
+
+        /* Animation Delays */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-300 font-sans antialiased selection:bg-primary-500 selection:text-white overflow-hidden flex h-screen">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass border-r border-dark-border transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col transition-transform duration-300 ease-in-out h-full">
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-dark-border shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-primary-500/30">
+                    <i class="ph ph-brain text-xl"></i>
+                </div>
+                <span class="text-white font-semibold text-lg tracking-wide">Nexus AI</span>
+            </div>
+            <!-- Close button mobile -->
+            <button id="close-sidebar" class="ml-auto lg:hidden text-slate-400 hover:text-white">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4">Menu</p>
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-300 hover:text-white group">
+                <i class="ph ph-squares-four text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-400 hover:text-white group">
+                <i class="ph ph-robot text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">Models</span>
+                <!-- Jinja2 example for dynamic badges -->
+                <!-- {% if active_models %} -->
+                <span class="ml-auto bg-primary-500/20 text-primary-400 text-xs py-0.5 px-2 rounded-full">8</span>
+                <!-- {% endif %} -->
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-400 hover:text-white group">
+                <i class="ph ph-database text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">Datasets</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-400 hover:text-white group">
+                <i class="ph ph-chart-line-up text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">Analytics</span>
+            </a>
+
+            <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-8">System</p>
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-400 hover:text-white group">
+                <i class="ph ph-gear text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">Settings</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-slate-400 hover:text-white group">
+                <i class="ph ph-shield-check text-xl group-hover:text-primary-400 transition-colors"></i>
+                <span class="font-medium">API Keys</span>
+            </a>
+        </nav>
+
+        <!-- User Profile (Bottom Sidebar) -->
+        <div class="p-4 border-t border-dark-border shrink-0">
+            <button class="flex items-center gap-3 w-full hover:bg-white/5 p-2 rounded-lg transition-colors text-left">
+                <img src="Mridul.JPG" alt="User" class="w-9 h-9 rounded-full object-cover border border-dark-border" onerror="this.src='https://ui-avatars.com/api/?name=Mridul+Kumar&background=2563eb&color=fff'">
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-medium text-white truncate">{{ user.name | default('Mridul Kumar') }}</p>
+                    <p class="text-xs text-slate-400 truncate">{{ user.email | default('AI Engineer') }}</p>
+                </div>
+                <i class="ph ph-caret-up text-slate-400"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <!-- Top Header -->
+        <header class="h-16 glass border-b border-dark-border flex items-center justify-between px-4 lg:px-8 z-30 shrink-0">
+            <div class="flex items-center gap-4">
+                <button id="open-sidebar" class="lg:hidden text-slate-400 hover:text-white p-1 rounded-md hover:bg-white/5 transition-colors">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                
+                <!-- Search Bar -->
+                <div class="hidden sm:flex items-center bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all w-64 lg:w-96">
+                    <i class="ph ph-magnifying-glass text-slate-400 text-lg"></i>
+                    <input type="text" placeholder="Search models, datasets..." class="bg-transparent border-none outline-none text-sm text-white px-2 w-full placeholder-slate-500">
+                    <div class="flex items-center gap-1">
+                        <kbd class="hidden lg:inline-block bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded border border-slate-700">⌘</kbd>
+                        <kbd class="hidden lg:inline-block bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded border border-slate-700">K</kbd>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-5">
+                <!-- Status indicator -->
+                <div class="hidden md:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    System Operational
+                </div>
+
+                <button class="relative p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+                    <i class="ph ph-bell text-xl"></i>
+                    <span class="absolute top-1 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-dark-bg"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 relative scroll-smooth">
+            
+            <!-- Background Glows -->
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto relative z-10 space-y-6">
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up">
+                    <div>
+                        <h1 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
+                        <p class="text-sm text-slate-400 mt-1">Welcome back, {{ user.name | default('Mridul') }}. Here's what's happening today.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-dark-border rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <i class="ph ph-calendar-blank"></i>
+                            Last 30 Days
+                        </button>
+                        <button class="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary-600/20 flex items-center gap-2">
+                            <i class="ph ph-plus-bold"></i>
+                            New Model
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <!-- Card 1 -->
+                    <div class="glass p-5 rounded-2xl border border-dark-border hover:border-primary-500/50 transition-all group animate-fade-in-up delay-100">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-activity text-xl"></i>
+                            </div>
+                            <span class="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">
+                                <i class="ph ph-trend-up"></i> +12.5%
+                            </span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium">Total Predictions</h3>
+                        <p class="text-2xl font-bold text-white mt-1">2.4M</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass p-5 rounded-2xl border border-dark-border hover:border-indigo-500/50 transition-all group animate-fade-in-up delay-200">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-clock text-xl"></i>
+                            </div>
+                            <span class="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">
+                                <i class="ph ph-trend-down"></i> -4.2%
+                            </span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium">Avg Latency</h3>
+                        <p class="text-2xl font-bold text-white mt-1">45<span class="text-sm font-normal text-slate-500 ml-1">ms</span></p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="glass p-5 rounded-2xl border border-dark-border hover:border-purple-500/50 transition-all group animate-fade-in-up delay-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-cpu text-xl"></i>
+                            </div>
+                            <span class="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">
+                                <i class="ph ph-check-circle"></i> Healthy
+                            </span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium">Active Models</h3>
+                        <p class="text-2xl font-bold text-white mt-1">8</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="glass p-5 rounded-2xl border border-dark-border hover:border-rose-500/50 transition-all group animate-fade-in-up" style="animation-delay: 400ms;">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-warning-circle text-xl"></i>
+                            </div>
+                            <span class="flex items-center gap-1 text-xs font-medium text-rose-400 bg-rose-400/10 px-2 py-1 rounded-md">
+                                <i class="ph ph-trend-up"></i> +2
+                            </span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium">Error Rate</h3>
+                        <p class="text-2xl font-bold text-white mt-1">0.12<span class="text-sm font-normal text-slate-500 ml-1">%</span></p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 500ms;">
+                    <!-- Main Chart -->
+                    <div class="glass p-6 rounded-2xl border border-dark-border lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-lg font-semibold text-white">API Traffic & Inferences</h2>
+                                <p class="text-xs text-slate-400">Requests per hour across all endpoints</p>
+                            </div>
+                            <button class="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400">
+                                <i class="ph ph-dots-three text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="h-72 w-full relative">
+                            <canvas id="trafficChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Chart/List -->
+                    <div class="glass p-6 rounded-2xl border border-dark-border flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-semibold text-white">Resource Usage</h2>
+                            <i class="ph ph-info text-slate-400"></i>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center relative">
+                            <div class="h-48 relative">
+                                <canvas id="resourceChart"></canvas>
+                                <!-- Center Text overlay for Doughnut -->
+                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-2xl font-bold text-white">78%</span>
+                                    <span class="text-xs text-slate-400">Allocated</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-primary-500"></div> GPU</span>
+                                    <span class="text-white font-medium">45%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-indigo-500"></div> CPU</span>
+                                    <span class="text-white font-medium">20%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-slate-600"></div> Memory</span>
+                                    <span class="text-white font-medium">13%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Deployments / Activity -->
+                <div class="glass rounded-2xl border border-dark-border overflow-hidden animate-fade-in-up" style="animation-delay: 600ms;">
+                    <div class="p-6 border-b border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-semibold text-white">Recent Deployments</h2>
+                            <p class="text-xs text-slate-400">Latest model updates and statuses</p>
+                        </div>
+                        <a href="#" class="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors">View All &rarr;</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4 font-medium">Model Name</th>
+                                    <th class="px-6 py-4 font-medium">Version</th>
+                                    <th class="px-6 py-4 font-medium">Status</th>
+                                    <th class="px-6 py-4 font-medium">Deployed</th>
+                                    <th class="px-6 py-4 font-medium text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-dark-border">
+                                <!-- Jinja2 Ready loop example -->
+                                <!-- {% for deployment in deployments %} -->
+                                <tr class="hover:bg-white/[0.02] transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-primary-500/10 text-primary-400 flex items-center justify-center">
+                                                <i class="ph ph-cube"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-white font-medium">fraud-detection-v2</p>
+                                                <p class="text-xs text-slate-500">XGBoost Ensemble</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-300">v2.4.1</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-400">2 hours ago</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                            <i class="ph ph-dots-three text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="hover:bg-white/[0.02] transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                                                <i class="ph ph-chat-teardrop-text"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-white font-medium">customer-support-llm</p>
+                                                <p class="text-xs text-slate-500">Llama-3-8B-Instruct</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-300">v1.0.0</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Training
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-400">5 hours ago</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                            <i class="ph ph-dots-three text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-white/[0.02] transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-rose-500/10 text-rose-400 flex items-center justify-center">
+                                                <i class="ph ph-image"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-white font-medium">image-segmentation-net</p>
+                                                <p class="text-xs text-slate-500">U-Net Architecture</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-300">v3.1.2</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Failed
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-400">1 day ago</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                            <i class="ph ph-dots-three text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- {% endfor %} -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer spacer -->
+                <div class="h-8"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Interactive Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sidebar Toggle Logic
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar');
+            const closeBtn = document.getElementById('close-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                // Small delay to allow display:block to apply before animating opacity
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    overlay.classList.add('opacity-100');
+                }, 10);
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300); // match transition duration
+            }
+
+            openBtn.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // Setup Chart Defaults for Dark Theme
+            Chart.defaults.color = '#94a3b8'; // slate-400
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            
+            // 1. Traffic Area Chart
+            const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+            
+            // Create Gradient
+            const gradientBlue = ctxTraffic.createLinearGradient(0, 0, 0, 400);
+            gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.5)'); // primary-500
+            gradientBlue.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            new Chart(ctxTraffic, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Requests',
+                        data: [1200, 1900, 3000, 5000, 4200, 3800, 2100],
+                        borderColor: '#3b82f6',
+                        backgroundColor: gradientBlue,
+                        borderWidth: 2,
+                        tension: 0.4, // smooth curves
+                        fill: true,
+                        pointBackgroundColor: '#0f172a',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' reqs';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { maxTicksLimit: 7 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)', borderDash: [5, 5], drawBorder: false },
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value / 1000 + 'k';
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                }
+            });
+
+            // 2. Resource Doughnut Chart
+            const ctxResource = document.getElementById('resourceChart').getContext('2d');
+            new Chart(ctxResource, {
+                type: 'doughnut',
+                data: {
+                    labels: ['GPU', 'CPU', 'Memory', 'Available'],
+                    datasets: [{
+                        data: [45, 20, 13, 22],
+                        backgroundColor: [
+                            '#3b82f6', // primary
+                            '#6366f1', // indigo
+                            '#475569', // slate
+                            'rgba(51, 65, 85, 0.2)' // empty
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
