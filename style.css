@@ -9,43 +9,46 @@
 }
 
 :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --accent: #0ea5e9;
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --accent: #8b5cf6;
     --secondary: #64748b;
-    --bg: #f8f9fa;
-    --bg-soft: #eef4ff;
+    --bg: #f8fafc;
+    --bg-soft: #f1f5f9;
     --surface: #ffffff;
-    --surface-alt: #f1f5f9;
-    --nav-bg: rgba(255, 255, 255, 0.8);
-    --nav-bg-scrolled: rgba(255, 255, 255, 0.95);
-    --overlay: rgba(37, 99, 235, 0.05);
-    --overlay-strong: rgba(37, 99, 235, 0.15);
-    --border-soft: rgba(37, 99, 235, 0.1);
-    --border-medium: rgba(37, 99, 235, 0.2);
-    --shadow: rgba(0, 0, 0, 0.05);
-    --shadow-strong: rgba(37, 99, 235, 0.2);
-    --text-dark: #1e293b;
+    --surface-alt: #ffffff;
+    --nav-bg: rgba(255, 255, 255, 0.7);
+    --nav-bg-scrolled: rgba(255, 255, 255, 0.85);
+    --overlay: rgba(59, 130, 246, 0.05);
+    --overlay-strong: rgba(59, 130, 246, 0.15);
+    --border-soft: rgba(59, 130, 246, 0.1);
+    --border-medium: rgba(59, 130, 246, 0.2);
+    --shadow: rgba(15, 23, 42, 0.08);
+    --shadow-strong: rgba(59, 130, 246, 0.25);
+    --text-dark: #0f172a;
     --text-light: #64748b;
     --border: #e2e8f0;
 }
 
 html[data-theme="dark"] {
-    --bg: #0b1120;
-    --bg-soft: #111827;
-    --surface: #111827;
-    --surface-alt: #0f172a;
-    --nav-bg: rgba(15, 23, 42, 0.78);
-    --nav-bg-scrolled: rgba(15, 23, 42, 0.94);
-    --overlay: rgba(96, 165, 250, 0.08);
-    --overlay-strong: rgba(96, 165, 250, 0.16);
-    --border-soft: rgba(96, 165, 250, 0.14);
-    --border-medium: rgba(96, 165, 250, 0.22);
-    --shadow: rgba(0, 0, 0, 0.2);
-    --shadow-strong: rgba(14, 165, 233, 0.22);
-    --text-dark: #e5e7eb;
+    --primary: #60a5fa;
+    --primary-dark: #3b82f6;
+    --accent: #a78bfa;
+    --bg: #030712;
+    --bg-soft: #0f172a;
+    --surface: rgba(15, 23, 42, 0.6);
+    --surface-alt: rgba(30, 41, 59, 0.5);
+    --nav-bg: rgba(3, 7, 18, 0.6);
+    --nav-bg-scrolled: rgba(3, 7, 18, 0.85);
+    --overlay: rgba(96, 165, 250, 0.05);
+    --overlay-strong: rgba(96, 165, 250, 0.15);
+    --border-soft: rgba(255, 255, 255, 0.05);
+    --border-medium: rgba(255, 255, 255, 0.1);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-strong: rgba(96, 165, 250, 0.3);
+    --text-dark: #f8fafc;
     --text-light: #94a3b8;
-    --border: #243041;
+    --border: rgba(255, 255, 255, 0.08);
 }
 
 html {
@@ -61,7 +64,8 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-h1, h2, h3, .logo {
+h1, h2, h3, h4, h5, h6, .logo {
+    font-family: 'Outfit', sans-serif;
     letter-spacing: -0.02em;
 }
 
@@ -75,19 +79,20 @@ nav {
     align-items: center;
     padding: 20px 10%;
     background: var(--nav-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-soft);
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 nav.scrolled {
-    box-shadow: 0 10px 30px var(--shadow);
+    box-shadow: 0 20px 40px var(--shadow);
     background: var(--nav-bg-scrolled);
+    padding: 15px 10%;
 }
 
 .logo {
@@ -447,13 +452,15 @@ nav.scrolled {
 .btn {
     display: inline-block;
     padding: 12px 28px;
-    border-radius: 8px;
+    border-radius: 12px;
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     border: none;
     font-size: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-primary {
@@ -463,8 +470,8 @@ nav.scrolled {
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 35px var(--shadow-strong);
 }
 
 .btn-secondary {
@@ -598,10 +605,19 @@ nav.scrolled {
 
 .skill-card {
     padding: 28px;
-    border-radius: 20px;
+    border-radius: 24px;
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-soft);
     box-shadow: 0 18px 38px var(--shadow);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px var(--shadow-strong);
+    border-color: var(--border-medium);
 }
 
 .skill-card h3 {
@@ -667,17 +683,20 @@ nav.scrolled {
 }
 
 .service-card {
-    padding: 26px;
-    border-radius: 18px;
+    padding: 30px;
+    border-radius: 24px;
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-soft);
     box-shadow: 0 14px 30px var(--shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .service-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 40px var(--shadow-strong);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 45px var(--shadow-strong);
+    border-color: var(--border-medium);
 }
 
 .service-icon {
@@ -756,16 +775,18 @@ nav.scrolled {
 
 .project-card {
     background: var(--surface);
-    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -1px rgba(0,0,0,0.03);
-    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px var(--shadow);
+    border: 1px solid var(--border-soft);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px var(--shadow), 0 10px 10px -5px rgba(0,0,0,0.04);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px var(--shadow-strong);
     border-color: var(--primary);
 }
 
@@ -873,11 +894,20 @@ nav.scrolled {
 }
 
 .resume-card {
-    padding: 28px;
-    border-radius: 20px;
+    padding: 30px;
+    border-radius: 24px;
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-soft);
     box-shadow: 0 16px 34px var(--shadow);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.resume-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px var(--shadow-strong);
+    border-color: var(--border-medium);
 }
 
 .resume-card h3 {

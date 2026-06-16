@@ -23,9 +23,9 @@
                             900: '#1e3a8a',
                         },
                         dark: {
-                            bg: '#0f172a',
-                            card: '#1e293b',
-                            border: '#334155'
+                            bg: '#030712',
+                            card: '#0f172a',
+                            border: '#1e293b'
                         }
                     },
                     animation: {
@@ -57,10 +57,11 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         
         .nav-item {
@@ -140,8 +141,8 @@
             <button class="flex items-center gap-3 w-full hover:bg-white/5 p-2 rounded-lg transition-colors text-left">
                 <img src="Mridul.JPG" alt="User" class="w-9 h-9 rounded-full object-cover border border-dark-border" onerror="this.src='https://ui-avatars.com/api/?name=Mridul+Kumar&background=2563eb&color=fff'">
                 <div class="flex-1 overflow-hidden">
-                    <p class="text-sm font-medium text-white truncate">{{ user.name | default('Mridul Kumar') }}</p>
-                    <p class="text-xs text-slate-400 truncate">{{ user.email | default('AI Engineer') }}</p>
+                    <p class="text-sm font-medium text-white truncate">Mridul Kumar</p>
+                    <p class="text-xs text-slate-400 truncate">AI Engineer</p>
                 </div>
                 <i class="ph ph-caret-up text-slate-400"></i>
             </button>
@@ -197,7 +198,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up">
                     <div>
                         <h1 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Overview</h1>
-                        <p class="text-sm text-slate-400 mt-1">Welcome back, {{ user.name | default('Mridul') }}. Here's what's happening today.</p>
+                        <p class="text-sm text-slate-400 mt-1">Welcome back, Mridul. Here's what's happening today.</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-dark-border rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
